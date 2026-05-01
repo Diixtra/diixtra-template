@@ -20,6 +20,15 @@
 
 <!-- TODO: Basic usage examples -->
 
+### After cloning a project from this template
+
+```sh
+mise install      # Install pinned tool versions
+lefthook install  # Wire up pre-commit hooks
+```
+
+CI is on observe mode by default. To switch to enforce, follow [the rollout SOP](https://github.com/Diixtra/diixtra-forge/blob/main/docs/code-quality/rollout.md) once the baseline is clean.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
