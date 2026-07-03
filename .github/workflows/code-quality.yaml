@@ -15,7 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Broker-routed placement: ask the Diixtra actions-broker which runner
+  # the code-quality jobs should use (cost-first, capacity-aware spill).
+  # FAIL-OPEN: any error falls back to the reusable's previous hardcoded
+  # runner - worst case is the status quo.
+  choose:
+    permissions:
+      id-token: write
+    uses: Diixtra/diixtra-forge/.github/workflows/choose-runner.yml@main
+    with:
+      target: standard-ci
+      size: small
+      mode: live
+      fallback: blacksmith-2vcpu-ubuntu-2404
+
   code-quality:
+    needs: choose
     uses: Diixtra/diixtra-forge/.github/workflows/code-quality.yaml@main
     with:
-      mode: observe
+      mode: enforce
+      runs-on: ${{ needs.choose.outputs.runs_on }}
