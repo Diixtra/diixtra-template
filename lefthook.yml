@@ -19,6 +19,16 @@ pre-commit:
           exit 1
         fi
 
+    # herdr: validate the workspace layout. Stdlib python only — no herdr binary
+    # needed — so this runs anywhere. Catches the silent failure mode where a
+    # pane omits cwd and permanently inherits $HOME.
+    herdr-layout:
+      glob: ".herdr/layout.json"
+      run: python3 .herdr/validate.py {staged_files}
+      skip:
+        - merge
+        - rebase
+
     # TS/JS: lint + format on staged files
     biome:
       glob: "*.{ts,tsx,js,jsx,json,jsonc}"

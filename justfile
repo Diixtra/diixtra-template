@@ -1,5 +1,51 @@
 # Diixtra repo management recipes
 
+# Safe to re-run: an existing workspace with this repo's name is rebuilt in
+# place rather than duplicated. `just workspace recreate=true` closes it first.
+# Open this repo as a herdr workspace, laid out from .herdr/layout.json
+workspace recreate="false":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v herdr-up >/dev/null; then
+        echo "herdr-up not found — it ships with the dotfiles:" >&2
+        echo "  https://github.com/jameskazie/dotfiles  (just apply)" >&2
+        echo "Without it: herdr workspace create --cwd \"\$PWD\" --label \"\$(basename \"\$PWD\")\"" >&2
+        exit 1
+    fi
+    if [ "{{ recreate }}" = "true" ]; then
+        herdr-up --recreate
+    else
+        herdr-up
+    fi
+
+# Named repos only, never the whole org: cloning 19 repos should be a decision,
+# not a side effect. Example: `just repo-workspaces midas argus qrbuddy`
+# Clone (if needed) and open the named Diixtra repos as herdr workspaces
+repo-workspaces +names:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    base="${GITHUB_DIR:-$HOME/Kazcloud/Github}"
+    mkdir -p "$base"
+    for name in {{ names }}; do
+        dir="$base/$name"
+        if [ ! -d "$dir" ]; then
+            echo "cloning Diixtra/$name -> $dir"
+            gh repo clone "Diixtra/$name" "$dir"
+        fi
+        if command -v herdr-up >/dev/null; then
+            herdr-up "$dir"
+        else
+            echo "herdr-up not found (ships with the dotfiles) — cloned only: $dir" >&2
+        fi
+    done
+
+# Validate .herdr/layout.json against herdr's LayoutNode shape
+check-workspace:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ -f .herdr/layout.json ] || { echo "no .herdr/layout.json — nothing to check"; exit 0; }
+    python3 .herdr/validate.py .herdr/layout.json
+
 # Create a new repo from the template
 repo-new name visibility="private":
     #!/usr/bin/env bash
