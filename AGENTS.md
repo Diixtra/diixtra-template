@@ -11,6 +11,20 @@ This repo participates in the four-slot org code-quality framework:
 3. **Renovate** — already configured org-wide.
 4. **Skill** — `code-review-triage` in `~/.claude/skills/` interprets CI findings into the four-outcome decision (fix / track / suppress / reject).
 
+## Development workspace
+
+`.herdr/layout.json` declares a [herdr](https://herdr.dev) workspace for this
+repo (editor / agent / `just --list` / `git status`), opened with `just
+workspace`. It is herdr's native `LayoutNode` tree, validated by
+`.herdr/validate.py` via `just check-workspace` and a pre-commit hook.
+
+Every pane must set `cwd` (use `${REPO}`): herdr fixes cwd at creation and has no
+`workspace.set_cwd`, so a pane that omits it inherits `$HOME` permanently. The
+validator enforces this.
+
+Opt-in and inert — nothing in the build depends on it, and deleting the file
+falls back to the machine-wide default layout.
+
 ## Guideline overrides
 
 If this repo needs to override an org-module rule, document it here under a `## Guideline Overrides` section per the diixtra-coding-guidelines skill template. Temporary overrides must link to an issue.

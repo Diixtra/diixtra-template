@@ -1,0 +1,59 @@
+{
+  "$comment": [
+    "herdr workspace layout for this project — see https://herdr.dev.",
+    "Opened with `just workspace` (or `herdr-up` from anywhere inside the repo).",
+    "",
+    "This is herdr's own LayoutNode tree, not a Diixtra invention: a binary tree of",
+    "'split' nodes (direction right|down, ratio 0..1) and 'pane' leaves. That means",
+    "herdr's docs are the reference, and a layout you arrange by hand can be dumped",
+    "with the socket API's layout.export and pasted straight in here.",
+    "",
+    "${REPO}, ${REPO_NAME} and ${HOME} are expanded when the layout is applied, so",
+    "this file does not care where the repo is cloned.",
+    "",
+    "Every pane sets cwd explicitly and on purpose: herdr fixes cwd at creation and",
+    "has no workspace.set_cwd, so a pane that omits it inherits $HOME and stays",
+    "there forever.",
+    "",
+    "Edit freely — this is a starting point per repo, not a standard to preserve.",
+    "Delete the file to fall back to the machine-wide default."
+  ],
+  "type": "split",
+  "direction": "right",
+  "ratio": 0.62,
+  "first": {
+    "type": "pane",
+    "label": "editor",
+    "cwd": "${REPO}",
+    "command": ["bash", "-lc", "command -v nvim >/dev/null && nvim; exec ${SHELL:-zsh}"]
+  },
+  "second": {
+    "type": "split",
+    "direction": "down",
+    "ratio": 0.5,
+    "first": {
+      "type": "pane",
+      "label": "agent",
+      "cwd": "${REPO}",
+      "command": ["bash", "-lc", "command -v claude >/dev/null && claude; exec ${SHELL:-zsh}"],
+      "env": { "HERDR_ROLE": "agent" }
+    },
+    "second": {
+      "type": "split",
+      "direction": "down",
+      "ratio": 0.5,
+      "first": {
+        "type": "pane",
+        "label": "just",
+        "cwd": "${REPO}",
+        "command": ["bash", "-lc", "command -v just >/dev/null && just --list; exec ${SHELL:-zsh}"]
+      },
+      "second": {
+        "type": "pane",
+        "label": "git",
+        "cwd": "${REPO}",
+        "command": ["bash", "-lc", "command -v watch >/dev/null && watch -n 2 -c \"git -c color.ui=always status -sb; echo; git -c color.ui=always diff --stat\"; exec ${SHELL:-zsh}"]
+      }
+    }
+  }
+}
