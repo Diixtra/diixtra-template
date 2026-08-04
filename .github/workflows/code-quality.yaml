@@ -9,6 +9,11 @@ permissions:
   contents: read
   pull-requests: read
   security-events: write
+  # Reusable code-quality.yaml declares `packages: read` for ts-quality
+  # to fetch private @<scope>/* deps from npm.pkg.github.com (#1786).
+  # Callers MUST mirror that scope, otherwise GitHub Actions rejects the
+  # workflow_call with `startup_failure`.
+  packages: read
 
 concurrency:
   group: code-quality-${{ github.ref }}
