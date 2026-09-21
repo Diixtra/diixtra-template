@@ -25,3 +25,6 @@ jobs:
     with:
       mode: enforce
       runs-on: ${{ vars.CI_LOCAL_RUNNERS == 'true' && '["ci-light"]' || '["ubuntu-latest"]' }}
+      # container: jobs (semgrep, trivy) need Docker — route them to the DinD pool
+      # under local runners; ci-light has no Docker (forge #4010).
+      runs-on-docker: ${{ vars.CI_LOCAL_RUNNERS == 'true' && '["ci-docker"]' || '["ubuntu-latest"]' }}
